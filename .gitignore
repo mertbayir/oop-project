@@ -1,0 +1,12 @@
+# Odev metni (repoya girmesin)
+ProjeOdevi_Son.docx
+
+# Visual Studio / .NET
+.vs/
+bin/
+obj/
+*.user
+*.suo
+*.db
+*.db-journal
+TestResults/
