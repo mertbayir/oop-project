@@ -84,6 +84,43 @@ Kurum -> Sube listesi. Tek klinik, tek şubeli bir kurumdur; ek sınıf ve özel
 **Neden bu kısıtlar var? (Hizmeti sadece kendi bölümünden eklemek, çalışanı sadece şubenin bölümüne eklemek)**
 Tutarsız veri girişini kapsülleme ile sınıfın içinde engellemek: bölümü olmayan hizmeti çalışan sunamaz, başka şubenin bölümündeki çalışan bu şubeye eklenemez.
 
+## 2b. Randevu ve teknik temel (C# bellek modeli)
+
+**`public Hasta Hasta { get; }` ne demek?**
+İlk Hasta tip, ikinci Hasta isim ("bu randevunun hastası"). C# bunu izin verir. `{ get; }` salt okunur property; değeri sadece constructor'da atanır.
+
+**Referans mı işaretçi mi?**
+Sınıf tipindeki değişken nesnenin kendisini değil, bellekteki yerine giden güvenli bir referansı tutar. İşaretçiden farkı: aritmetik yok, geçersiz adrese erişilemez, çöp toplayıcı (GC) nesneyi kendisi siler. Değer tipleri (int, decimal, DateTime, TimeSpan, enum) değerin kendisini tutar; kopyalayınca değer kopyalanır. Referans tipleri (class) kopyalayınca adres kopyalanır.
+
+**`var h2 = h1; h2.Telefon = "999";` sonrası h1.Telefon?**
+"999". İkisi de aynı nesneyi gösteriyor, nesne tek.
+
+**Aynı hasta DB'den iki kez yüklenirse `h1 == h2` neden false olabilir?**
+Sınıflarda `==` varsayılan olarak adresleri karşılaştırır. İki ayrı nesne olur, Id'leri aynı olsa da uygulama onları farklı kişi sanır. Bu yüzden karşılaştırmayı Id üzerinden yapıyoruz (`hasta.Id != Hasta.Id`).
+
+**Randevu neden Sure ve Ucret'i kopyalıyor?**
+Ödev "randevu detayları (işlem, süre, ücret...) kaydedilecek" diyor. decimal/TimeSpan değer tipi olduğu için kopyalanır; hizmetin ücreti sonradan değişse geçmiş randevu değişmez. `Hizmet` ise referans olduğundan `randevu.Hizmet.Ucret` güncel fiyatı gösterir, `randevu.Ucret` randevu anındaki fiyatı.
+
+**null nedir, neden `ThrowIfNull`?**
+Referans hiçbir nesneyi göstermiyorsa null'dır; üzerinden üye çağırınca NullReferenceException çıkar. Hatayı en başta, anlaşılır mesajla yakalamak için constructor'larda kontrol ediyoruz.
+
+**Randevunun durumu nasıl korunuyor?**
+`Durum { get; private set; }`: dışarıdan atanamaz. Tek yol Onayla / Reddet / IptalEt / Tamamla; hepsi `GecisYap` üzerinden geçer: yeni durum ancak izin verilen önceki durumlardan gelinebilir. Geçişler: Beklemede -> Onaylandi | Iptal; Onaylandi -> Tamamlandi | Iptal. İptal ve Tamamlandi son durumlardır.
+
+**Yetki randevunun içinde nasıl?**
+Onayla/Reddet/Tamamla sadece randevunun kendi çalışanından, IptalEt sadece randevunun kendi hastasından kabul edilir (Id karşılaştırması). Sıra: önce kim yapıyor (yetki), sonra durum uygun mu.
+
+**Randevu çakışması nasıl bulunur?**
+Aynı çalışan VE ikisi de slotu tutuyor (Beklemede/Onaylandi) VE `A.Baslangic < B.Bitis && B.Baslangic < A.Bitis`. `&&` kısa devre yapar; farklı çalışanlarda zaman karşılaştırması hiç çalışmaz. 10:00-10:30 ile 10:30-11:00 çakışmaz.
+
+**Constructor'da hangi kurallar kontrol ediliyor?**
+Çalışan hizmeti sunuyor mu; randevu gece yarısını aşmıyor mu (TimeOnly 24 saatte başa sarar, bit <= bas olur); çalışanın uygunluk aralığına sığıyor mu. Kural dışı randevu hiç var olmaz.
+
+**Bilinen sınırlar (dürüstçe söylenecek):**
+- "Yeni randevu mevcut tüm randevularla çakışıyor mu" kontrolü Randevu içinde değil, tüm randevuları bilen servis katmanında yapılacak.
+- Geçmiş tarihe randevu engeli serviste olacak.
+- Constructor kuralları DB'den eski randevu yüklerken sorun çıkarabilir (çalışanın uygunluğu sonradan değiştiyse); SQLite aşamasında ele alınacak.
+
 ## 3. Alınan tasarım kararları (özet)
 1. Calisan soyut üst sınıf -> Doktor, SaglikPersoneli
 2. Randevu Calisan'a bağlı
