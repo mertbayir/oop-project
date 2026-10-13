@@ -1,8 +1,8 @@
 using System.Security.Cryptography;
 using System.Text;
-using Randevu.Core.Enums;
+using HastaneRandevu.Core.Enums;
 
-namespace Randevu.Core.Models;
+namespace HastaneRandevu.Core.Models;
 
 // SOYUTLAMA: abstract oldugu icin "new Kullanici()" yazilamaz.
 // Her kullanici ya Hasta, ya Calisan, ya Yonetici olmak zorunda.

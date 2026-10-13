@@ -1,4 +1,4 @@
-namespace Randevu.Core.Models;
+namespace HastaneRandevu.Core.Models;
 
 // Bir bolumun sundugu saglik hizmeti (genel muayene, rontgen vb.).
 // Odev: "her hizmetin suresi ve ucreti detayli sekilde tanimlanabilecek".

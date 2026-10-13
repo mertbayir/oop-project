@@ -1,4 +1,4 @@
-namespace Randevu.Core.Models;
+namespace HastaneRandevu.Core.Models;
 
 // Bir kurumun subesi (karar 3). Tek klinik = tek subeli kurum.
 // Odev: "her klinik/hastanenin calisma saatleri ve bolumleri tanimlanabilecek".

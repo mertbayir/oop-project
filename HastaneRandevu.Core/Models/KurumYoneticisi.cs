@@ -1,6 +1,6 @@
-using Randevu.Core.Enums;
+using HastaneRandevu.Core.Enums;
 
-namespace Randevu.Core.Models;
+namespace HastaneRandevu.Core.Models;
 
 // Kendi kurumunu yapilandiran yonetici (odev: "Hastane / Klinik Yoneticisi").
 public class KurumYoneticisi : Kullanici

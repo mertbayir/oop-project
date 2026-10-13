@@ -1,4 +1,4 @@
-namespace Randevu.Core.Models;
+namespace HastaneRandevu.Core.Models;
 
 // Bir subenin bolumu (Kardiyoloji, Radyoloji, Laboratuvar...). Hizmetler bolume baglidir.
 public class Bolum

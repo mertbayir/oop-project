@@ -1,6 +1,6 @@
-using Randevu.Core.Enums;
+using HastaneRandevu.Core.Enums;
 
-namespace Randevu.Core.Models;
+namespace HastaneRandevu.Core.Models;
 
 // KALITIM: Hasta bir Kullanici'dir ("is-a"). Id, Ad, Soyad, Email ve sifre islerini
 // Kullanici'dan miras alir, burada tekrar yazilmaz.

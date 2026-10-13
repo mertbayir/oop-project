@@ -1,4 +1,4 @@
-namespace Randevu.Core.Models;
+namespace HastaneRandevu.Core.Models;
 
 // Hastane veya klinik. Bir veya daha fazla subesi olur (karar 3).
 public class Kurum

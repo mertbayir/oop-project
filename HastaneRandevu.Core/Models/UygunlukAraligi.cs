@@ -1,4 +1,4 @@
-namespace Randevu.Core.Models;
+namespace HastaneRandevu.Core.Models;
 
 // Bir calisanin haftalik uygunluk araligi, orn: Pazartesi 09:00 - 12:00.
 // Odev: "hastalar sadece bu zaman araliklarina randevu alabilecek".
