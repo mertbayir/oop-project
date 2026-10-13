@@ -121,6 +121,29 @@ Aynı çalışan VE ikisi de slotu tutuyor (Beklemede/Onaylandi) VE `A.Baslangic
 - Geçmiş tarihe randevu engeli serviste olacak.
 - Constructor kuralları DB'den eski randevu yüklerken sorun çıkarabilir (çalışanın uygunluğu sonradan değiştiyse); SQLite aşamasında ele alınacak.
 
+## 2c. Servis katmanı ve isimlendirme
+
+**RandevuServisi ne işe yarar? Neden ayrı bir sınıf?**
+Tek bir randevu sadece kendi kurallarını bilir (yetki, durum geçişi, uygunluğa sığma). "Bu çalışanın bu saatte başka randevusu var mı?" sorusu tüm randevuları bilmeyi gerektirir; bunu bilen katman servistir. Servis randevu listesini tutar ve çakışma, geçmiş tarih, boş slot gibi kuralları uygular. Kişisel kuralları Randevu'ya bırakır.
+
+**RandevuOlustur nasıl çalışır?**
+1) Zaman geçmişte mi? 2) Randevu nesnesi oluşturulur (kendi kuralları constructor'da kontrol edilir). 3) Listedeki randevulardan biri yenisiyle çakışıyor mu? 4) Hepsi tamamsa sayaç artırılır, listeye eklenir. Numarayı kontrollerden önce artırmıyoruz (`_sonId + 1`), böylece hatalı denemeler numara tüketmez.
+
+**Boş slotlar nasıl hesaplanır?**
+Çalışanın o günkü uygunluk aralığı, hizmet süresi kadar adımlarla taranır (09:00, 09:30, ...). Her aday için slotu tutan (Beklemede/Onaylandi) bir randevuyla örtüşüp örtüşmediğine bakılır; örtüşmeyen ve geçmişte kalmayanlar listeye eklenir. Uygunluk aralığı sadece saat (TimeOnly), randevu ise tam tarih (DateTime) tuttuğu için karşılaştırmadan önce `tarih.Date + saat` ile birleştirilir. Örnek: 09-11 aralığı, 30 dk hizmet, 09:30-10:00 dolu -> 09:00, 10:00, 10:30.
+
+**Neden ayrı bir depo (repository) katmanı yok?**
+İlk tasarımda IRandevuDeposu vardı; kaldırdık. Ödev için zorunlu değil, "ileride lazım olur" diye eklenmişti ve anlaşılırlığı düşürüyordu. Gereksiz soyutlama eklememek de bir tasarım kararıdır. Soyutlama örneklerimiz zaten var: abstract Kullanici/Calisan, IRandevuServisi, ilerde IBildirimServisi. SQLite eklenirken ihtiyaç somutlaşınca ele alınır.
+
+**IRandevuServisi neden var?**
+Arayüz (ekranlar) servisin nasıl çalıştığını değil, ne yapabildiğini bilir. Ekran "randevu oluştur" der, kuralları servis uygular.
+
+**Neden namespace `HastaneRandevu`, `Randevu` değil?**
+Proje `Randevu.Core` adındayken "Randevu" hem en üst namespace hem de Models içindeki sınıf adıydı. Derleyici bir ismi ararken en üstteki namespace'i bulup durur, `using` ile getirilen sınıfa ulaşmaz ("'Randevu' bir ad alanı öğesidir ancak tür olarak kullanılır"). Geçici çözüm `Models.Randevu` yazmaktı. Kalıcı çözüm olarak kök namespace `HastaneRandevu` yapıldı; artık `Randevu` yazmak yeter.
+
+**IReadOnlyList / ToList neden?**
+Dışarıya listenin kendisini değil salt okunur bir görünüm veya kopya veriyoruz; dışarıdan Add/Clear yapılamaz.
+
 ## 3. Alınan tasarım kararları (özet)
 1. Calisan soyut üst sınıf -> Doktor, SaglikPersoneli
 2. Randevu Calisan'a bağlı
