@@ -1,17 +1,22 @@
+using HastaneRandevu.Core.Enums;
 using HastaneRandevu.Core.Models;
 
 namespace HastaneRandevu.Core.Services;
 
 // Tum randevulari bilen katman: tek bir randevunun bilemeyecegi kurallari (cakisma, gecmis tarih,
-// bos slotlar) burada kontrol eder.
+// bos slotlar) burada kontrol eder. Ayrica islemi yapanin YETKISI olup olmadigini kontrol eder.
 public class RandevuServisi : IRandevuServisi
 {
     // KAPSULLEME: randevu listesi private, disaridan sadece bu sinifin metodlariyla degisir.
     private readonly List<Randevu> _randevular = new();
     private int _sonId;
 
-    public Randevu RandevuOlustur(Hasta hasta, Calisan calisan, Hizmet hizmet, DateTime baslangic)
+    public Randevu RandevuOlustur(Kullanici islemYapan, Calisan calisan, Hizmet hizmet, DateTime baslangic)
     {
+        // COK BICIMLILIK: islemYapan Hasta mi Doktor mu bilmiyoruz; kendi YetkiVarMi'si cevap verir.
+        YetkiKontrol(islemYapan, Yetki.RandevuAl);
+        Hasta hasta = HastaOlmali(islemYapan);
+
         if (baslangic <= DateTime.Now)
             throw new InvalidOperationException("Gecmis bir zamana randevu alinamaz.");
 
@@ -60,10 +65,29 @@ public class RandevuServisi : IRandevuServisi
         return slotlar;
     }
 
-    public void Onayla(int randevuId, Calisan calisan) => Bul(randevuId).Onayla(calisan);
-    public void Reddet(int randevuId, Calisan calisan) => Bul(randevuId).Reddet(calisan);
-    public void Tamamla(int randevuId, Calisan calisan) => Bul(randevuId).Tamamla(calisan);
-    public void IptalEt(int randevuId, Hasta hasta) => Bul(randevuId).IptalEt(hasta);
+    public void Onayla(int randevuId, Kullanici islemYapan)
+    {
+        YetkiKontrol(islemYapan, Yetki.RandevuOnayla);
+        Bul(randevuId).Onayla(CalisanOlmali(islemYapan));
+    }
+
+    public void Reddet(int randevuId, Kullanici islemYapan)
+    {
+        YetkiKontrol(islemYapan, Yetki.RandevuOnayla);
+        Bul(randevuId).Reddet(CalisanOlmali(islemYapan));
+    }
+
+    public void Tamamla(int randevuId, Kullanici islemYapan)
+    {
+        YetkiKontrol(islemYapan, Yetki.RandevuOnayla);
+        Bul(randevuId).Tamamla(CalisanOlmali(islemYapan));
+    }
+
+    public void IptalEt(int randevuId, Kullanici islemYapan)
+    {
+        YetkiKontrol(islemYapan, Yetki.RandevuIptalEt);
+        Bul(randevuId).IptalEt(HastaOlmali(islemYapan));
+    }
 
     public IReadOnlyList<Randevu> CalisaninRandevulari(Calisan calisan)
         => _randevular.Where(r => r.Calisan.Id == calisan.Id).ToList();
@@ -74,4 +98,20 @@ public class RandevuServisi : IRandevuServisi
     private Randevu Bul(int randevuId)
         => _randevular.FirstOrDefault(r => r.Id == randevuId)
            ?? throw new InvalidOperationException("Randevu bulunamadi.");
+
+    // Rol ne olursa olsun ayni soru sorulur; cevabi kullanicinin kendi sinifi verir.
+    private static void YetkiKontrol(Kullanici kullanici, Yetki yetki)
+    {
+        ArgumentNullException.ThrowIfNull(kullanici);
+
+        if (!kullanici.YetkiVarMi(yetki))
+            throw new UnauthorizedAccessException($"{kullanici.RolAdi} rolunun bu islem icin yetkisi yok.");
+    }
+
+    // Yetki kontrolunden gectikten sonra Randevu'nun metodlari Hasta/Calisan tipi ister; tipe cevirir.
+    private static Hasta HastaOlmali(Kullanici kullanici)
+        => kullanici as Hasta ?? throw new UnauthorizedAccessException("Bu islemi sadece hasta yapabilir.");
+
+    private static Calisan CalisanOlmali(Kullanici kullanici)
+        => kullanici as Calisan ?? throw new UnauthorizedAccessException("Bu islemi sadece calisan yapabilir.");
 }
