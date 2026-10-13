@@ -144,6 +144,28 @@ Proje `Randevu.Core` adındayken "Randevu" hem en üst namespace hem de Models i
 **IReadOnlyList / ToList neden?**
 Dışarıya listenin kendisini değil salt okunur bir görünüm veya kopya veriyoruz; dışarıdan Add/Clear yapılamaz.
 
+## 2d. Yetki kontrolü (çok biçimliliğin canlı örneği)
+
+**Servis kullanıcının hasta mı doktor mu olduğunu nasıl anlıyor?**
+Anlamaya çalışmıyor. Giriş yapan kişi `Kullanici` tipinde bir değişkende durur. Servis sadece `kullanici.YetkiVarMi(Yetki.RandevuOnayla)` diye sorar; cevabı kişinin gerçek sınıfı verir (Hasta: hayır, Doktor: evet, Yönetici: hayır). Serviste `if (rol == ...)` yok. Çağıran kod rolden bağımsız, sonucu nesnenin gerçek türü belirliyor.
+
+**Neden servis metodları Hasta/Calisan yerine Kullanici alıyor?**
+Parametre `Hasta` olsaydı yetki sorusunun cevabı hep aynı olurdu, kontrol anlamsız kalırdı. `Kullanici` alınca aynı metoda herkes gelebilir ve gerçek davranış farkı görünür.
+
+**İki kapı:**
+- Kapı 1 (servis): bu ROL bu TÜR işi yapabilir mi? (Hasta onaylayamaz, yönetici randevu alamaz.)
+- Kapı 2 (Randevu): bu KİŞİ bu RANDEVUNUN sahibi mi? (Başka çalışan onaylayamaz, başka hasta iptal edemez.)
+Hemşire birinci kapıyı geçer (Calisan'dan miras aldığı yetki var) ama randevunun çalışanı değilse ikincide takılır.
+
+**Neden `as Calisan ?? throw` dönüşümü var?**
+Yetki kontrolünden geçtikten sonra elimizde hâlâ `Kullanici` tipinde bir değişken var; Randevu.Onayla `Calisan` istiyor. `as` "bu kişiyi Calisan olarak görmeyi dene, olmazsa null ver" demek, `??` null ise hata fırlatır. Pratikte hata vermez, emniyet kemeri; ileride yanlış bir rol yetkilendirilirse sessiz hatayı önler.
+
+**Hata türleri neden ayrı?**
+Yetki hatası: `UnauthorizedAccessException`. İş kuralı hatası (çakışma, geçmiş tarih): `InvalidOperationException`. Arayüz ikisini ayırıp farklı mesaj gösterebilir.
+
+**Yeni rol eklemek ne gerektirir?**
+Yeni bir sınıf (Kullanici'dan türeyen, kendi RolAdi ve YetkiVarMi ile). `YetkiKontrol` satırı değişmez; açık-kapalı ilkesi (genişlemeye açık, değişikliğe kapalı). Bilinen sınır: RandevuOlustur randevuyu işlemi yapan kişi için aldığından, başkası adına randevu alan bir rol (resepsiyonist) gerekirse servise "hangi hasta için" parametresi eklenmesi gerekir.
+
 ## 3. Alınan tasarım kararları (özet)
 1. Calisan soyut üst sınıf -> Doktor, SaglikPersoneli
 2. Randevu Calisan'a bağlı
