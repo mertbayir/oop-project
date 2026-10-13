@@ -1,6 +1,6 @@
-using Randevu.Core.Enums;
+using HastaneRandevu.Core.Enums;
 
-namespace Randevu.Core.Models;
+namespace HastaneRandevu.Core.Models;
 
 // Bir hastanin bir calisandan aldigi randevu.
 // Odev: "randevu detaylari (islem, sure, ucret, calisan, tarih/saat) kaydedilecek" ve "onay mekanizmasi olacak".
@@ -88,8 +88,12 @@ public class Randevu
 
         return Calisan.Id == diger.Calisan.Id
             && SlotuTutuyor && diger.SlotuTutuyor
-            && Baslangic < diger.Bitis && diger.Baslangic < Bitis;
+            && ZamanOrtusuyor(diger.Baslangic, diger.Bitis);
     }
+
+    // Verilen zaman araligi bu randevuyla ortusuyor mu? (Slot hesabi da bunu kullanir; formul tek yerde.)
+    public bool ZamanOrtusuyor(DateTime baslangic, DateTime bitis)
+        => Baslangic < bitis && baslangic < Bitis;
 
     private void CalisanKontrol(Calisan calisan)
     {

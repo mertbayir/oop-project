@@ -1,4 +1,4 @@
-namespace Randevu.Core.Enums;
+namespace HastaneRandevu.Core.Enums;
 
 // Sistemdeki her islem icin bir yetki. Kullanici.YetkiVarMi(...) bunlarla calisir.
 public enum Yetki

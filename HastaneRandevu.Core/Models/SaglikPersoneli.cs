@@ -1,4 +1,4 @@
-namespace Randevu.Core.Models;
+namespace HastaneRandevu.Core.Models;
 
 // Doktor disindaki saglik calisani (hemsire, teknisyen...). Ek ozelligi: unvan.
 public class SaglikPersoneli : Calisan

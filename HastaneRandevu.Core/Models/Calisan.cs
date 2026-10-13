@@ -1,6 +1,6 @@
-using Randevu.Core.Enums;
+using HastaneRandevu.Core.Enums;
 
-namespace Randevu.Core.Models;
+namespace HastaneRandevu.Core.Models;
 
 // Doktor ve SaglikPersoneli'nin ortak ust sinifi (karar 1). abstract: "sadece calisan" olmaz.
 // Randevu bu sinifa baglanir (karar 2), yani hizmeti kim verirse versin Randevu icin fark etmez.

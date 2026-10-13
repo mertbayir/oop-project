@@ -1,6 +1,6 @@
-using Randevu.Core.Enums;
+using HastaneRandevu.Core.Enums;
 
-namespace Randevu.Core.Models;
+namespace HastaneRandevu.Core.Models;
 
 // Kurumlari tanimlayan ust duzey yonetici (odev: kurumlar "yetki cercevesinde" tanimlanabilecek).
 public class SistemYoneticisi : Kullanici

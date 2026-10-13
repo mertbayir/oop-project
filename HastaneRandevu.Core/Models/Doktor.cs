@@ -1,4 +1,4 @@
-namespace Randevu.Core.Models;
+namespace HastaneRandevu.Core.Models;
 
 // Calisan'dan turer. Ek ozelligi: uzmanlik alani (odev: "her doktorun uzmanlik alani tanimlanabilecek").
 public class Doktor : Calisan

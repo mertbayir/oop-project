@@ -1,4 +1,4 @@
-namespace Randevu.Core.Enums;
+namespace HastaneRandevu.Core.Enums;
 
 public enum RandevuDurumu
 {
