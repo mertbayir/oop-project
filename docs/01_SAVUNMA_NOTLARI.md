@@ -166,6 +166,35 @@ Yetki hatası: `UnauthorizedAccessException`. İş kuralı hatası (çakışma, 
 **Yeni rol eklemek ne gerektirir?**
 Yeni bir sınıf (Kullanici'dan türeyen, kendi RolAdi ve YetkiVarMi ile). `YetkiKontrol` satırı değişmez; açık-kapalı ilkesi (genişlemeye açık, değişikliğe kapalı). Bilinen sınır: RandevuOlustur randevuyu işlemi yapan kişi için aldığından, başkası adına randevu alan bir rol (resepsiyonist) gerekirse servise "hangi hasta için" parametresi eklenmesi gerekir.
 
+## 2e. Yönetim, giriş ve kayıt
+
+**Kurum, şube, bölüm, hizmet ve çalışan ekleme neden bir serviste?**
+Ödev "hastaneler yetki çerçevesinde tanımlanabilecek" diyor. Model metodları (Kurum.SubeEkle, Sube.CalisanEkle...) herkesin çağırabileceği metodlardı; KurumYonetimServisi bunları yetkiye bağlar. Kurum tanımlama sadece Sistem Yöneticisi (Yetki.KurumTanimla); şube, bölüm ve çalışma saati ekleme Kurum Yöneticisi (KurumDuzenle); hizmet ekleme HizmetYonet; çalışan ekleme CalisanYonet.
+
+**Başka kurumun yöneticisi neden işlem yapamıyor?**
+Şube, yöneticinin KENDİ kurumunun şubeleri arasında aranır (`yonetici.Kurum.Subeler`). Başkasının şubesi orada yok, "kurumunuzda bulunamadı" hatası alır. Ayrı bir kontrol yazmadan arama alanı daraltılarak çözüldü.
+
+**Yetkilendirme sınıfı neden var?**
+Aynı "kullanıcının bu yetkisi var mı?" sorusu iki serviste de gerekiyordu; kopyalamak yerine tek yere (internal static class) taşındı. İçinde `kullanici.YetkiVarMi(...)` çağrısı var: çok biçimlilik.
+
+**KullaniciServisi ne yapar?**
+Hasta kendi kendine kayıt olur (HastaKayitOl), diğer kullanıcılar Kaydet ile sisteme alınır, GirisYap e-posta ve şifre doğruysa `Kullanici` tipinde kişiyi döndürür. Dönen kişinin hasta mı doktor mu olduğu bilinmez; sonraki servisler YetkiVarMi ile anlar.
+
+**Giriş hatası neden tek mesaj ("E-posta veya sifre hatali")?**
+Hangi alanın yanlış olduğunu söylersek dışarıdan biri hangi e-postaların kayıtlı olduğunu öğrenebilir.
+
+**`kullanici is null || !kullanici.SifreDogrula(sifre)` neden güvenli?**
+`||` kısa devre yapar: kişi null ise ikinci kısım hiç çalışmaz, null üzerinde metod çağrılmaz.
+
+**Nesne oluşurken hangi sınıflardan geçilir? (Hasta için)**
+KullaniciServisi.HastaKayitOl -> Hasta constructor -> `: base(...)` ile Kullanici constructor (Id, Ad/Soyad/Email setter'ları -> BosOlamaz, Hashle) -> Hasta'nın kendi gövdesi (Telefon setter) -> KullaniciServisi.Kaydet (e-posta ve numara kontrolü, listeye ekleme). Üst sınıf her zaman önce çalışır; constructor hata fırlatırsa yarım nesne oluşmaz.
+
+**Çalışanın uygunluğu neden şube saatleriyle sınırlı?**
+Ödev hem kurumun çalışma saatlerini hem doktorun uygunluğunu tanımlıyor; şube kapalıyken uygunluk olamaz. `KurumYonetimServisi.UygunlukEkle` sırayla: rol yetkisi (UygunlukDuzenle), "bu senin takvimin mi" (islemYapan.Id == calisan.Id), şube bu saatte açık mı (`Sube.AcikMi`), sonra Calisan.UygunlukEkle'nin kendi çakışma kontrolü. Her kural onu bilen yerde durur. Sınır: şubenin hiç çalışma saati tanımlı değilse uygunluk eklenemez.
+
+**Demo projesi nedir?**
+HastaneRandevu.Demo: arayüz gelene kadar dört NDP kavramını ve tüm akışı konsola yazdıran küçük bir program (`dotnet run --project HastaneRandevu.Demo`).
+
 ## 3. Alınan tasarım kararları (özet)
 1. Calisan soyut üst sınıf -> Doktor, SaglikPersoneli
 2. Randevu Calisan'a bağlı
