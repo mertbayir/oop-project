@@ -1,3 +1,5 @@
+using System.Globalization;
+
 namespace HastaneRandevu.Core.Models;
 
 // Bir calisanin haftalik uygunluk araligi, orn: Pazartesi 09:00 - 12:00.
@@ -31,5 +33,8 @@ public class UygunlukAraligi
     public bool Cakisiyor(UygunlukAraligi diger)
         => Gun == diger.Gun && Baslangic < diger.Bitis && diger.Baslangic < Bitis;
 
-    public override string ToString() => $"{Gun} {Baslangic:HH\\:mm}-{Bitis:HH\\:mm}";
+    // Gunun Turkce adi ("Pazartesi"); ekranlarda ve ToString'de bu kullanilir.
+    public string GunAdi => CultureInfo.GetCultureInfo("tr-TR").DateTimeFormat.GetDayName(Gun);
+
+    public override string ToString() => $"{GunAdi} {Baslangic:HH\\:mm}-{Bitis:HH\\:mm}";
 }
