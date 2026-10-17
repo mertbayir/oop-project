@@ -14,7 +14,7 @@ public class RandevuServisi : IRandevuServisi
     public Randevu RandevuOlustur(Kullanici islemYapan, Calisan calisan, Hizmet hizmet, DateTime baslangic)
     {
         // COK BICIMLILIK: islemYapan Hasta mi Doktor mu bilmiyoruz; kendi YetkiVarMi'si cevap verir.
-        YetkiKontrol(islemYapan, Yetki.RandevuAl);
+        Yetkilendirme.Kontrol(islemYapan, Yetki.RandevuAl);
         Hasta hasta = HastaOlmali(islemYapan);
 
         if (baslangic <= DateTime.Now)
@@ -67,25 +67,25 @@ public class RandevuServisi : IRandevuServisi
 
     public void Onayla(int randevuId, Kullanici islemYapan)
     {
-        YetkiKontrol(islemYapan, Yetki.RandevuOnayla);
+        Yetkilendirme.Kontrol(islemYapan, Yetki.RandevuOnayla);
         Bul(randevuId).Onayla(CalisanOlmali(islemYapan));
     }
 
     public void Reddet(int randevuId, Kullanici islemYapan)
     {
-        YetkiKontrol(islemYapan, Yetki.RandevuOnayla);
+        Yetkilendirme.Kontrol(islemYapan, Yetki.RandevuOnayla);
         Bul(randevuId).Reddet(CalisanOlmali(islemYapan));
     }
 
     public void Tamamla(int randevuId, Kullanici islemYapan)
     {
-        YetkiKontrol(islemYapan, Yetki.RandevuOnayla);
+        Yetkilendirme.Kontrol(islemYapan, Yetki.RandevuOnayla);
         Bul(randevuId).Tamamla(CalisanOlmali(islemYapan));
     }
 
     public void IptalEt(int randevuId, Kullanici islemYapan)
     {
-        YetkiKontrol(islemYapan, Yetki.RandevuIptalEt);
+        Yetkilendirme.Kontrol(islemYapan, Yetki.RandevuIptalEt);
         Bul(randevuId).IptalEt(HastaOlmali(islemYapan));
     }
 
@@ -98,15 +98,6 @@ public class RandevuServisi : IRandevuServisi
     private Randevu Bul(int randevuId)
         => _randevular.FirstOrDefault(r => r.Id == randevuId)
            ?? throw new InvalidOperationException("Randevu bulunamadi.");
-
-    // Rol ne olursa olsun ayni soru sorulur; cevabi kullanicinin kendi sinifi verir.
-    private static void YetkiKontrol(Kullanici kullanici, Yetki yetki)
-    {
-        ArgumentNullException.ThrowIfNull(kullanici);
-
-        if (!kullanici.YetkiVarMi(yetki))
-            throw new UnauthorizedAccessException($"{kullanici.RolAdi} rolunun bu islem icin yetkisi yok.");
-    }
 
     // Yetki kontrolunden gectikten sonra Randevu'nun metodlari Hasta/Calisan tipi ister; tipe cevirir.
     private static Hasta HastaOlmali(Kullanici kullanici)

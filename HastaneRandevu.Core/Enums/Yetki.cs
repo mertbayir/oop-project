@@ -9,5 +9,6 @@ public enum Yetki
     UygunlukDuzenle,
     CalisanYonet,
     HizmetYonet,
+    KurumDuzenle,
     KurumTanimla
 }

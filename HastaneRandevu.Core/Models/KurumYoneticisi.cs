@@ -17,5 +17,5 @@ public class KurumYoneticisi : Kullanici
     public override string RolAdi => "Kurum Yoneticisi";
 
     public override bool YetkiVarMi(Yetki yetki)
-        => yetki == Yetki.CalisanYonet || yetki == Yetki.HizmetYonet;
+        => yetki == Yetki.CalisanYonet || yetki == Yetki.HizmetYonet || yetki == Yetki.KurumDuzenle;
 }
