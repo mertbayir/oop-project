@@ -7,9 +7,15 @@ namespace HastaneRandevu.App;
 // Veritabani olmadigi icin program acilirken ornek verilerle doldurulur.
 public class UygulamaVerisi
 {
-    public KullaniciServisi KullaniciServisi { get; } = new();
-    public KurumYonetimServisi YonetimServisi { get; } = new();
+    public KullaniciServisi KullaniciServisi { get; }
+    public KurumYonetimServisi YonetimServisi { get; }
     public IRandevuServisi RandevuServisi { get; } = new RandevuServisi();
+
+    private UygulamaVerisi()
+    {
+        KullaniciServisi = new KullaniciServisi();
+        YonetimServisi = new KurumYonetimServisi(KullaniciServisi);   // yonetim servisi, ayni kullanici listesini kullanir
+    }
 
     public static UygulamaVerisi Olustur()
     {
