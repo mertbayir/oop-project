@@ -95,7 +95,7 @@ Console.WriteLine($"  Boş saatler (iptal sonrası): " + string.Join(", ", servi
 
 // ---------- 6. KURUM YÖNETİMİ (yetkiyle tanımlama) ----------
 Baslik("6. KURUM YÖNETİMİ: kimin neyi tanımlayabildiği");
-var yonetim = new KurumYonetimServisi();
+var yonetim = new KurumYonetimServisi(new KullaniciServisi());
 Kurum? yeniKurum = null;
 Dene("Hasta kurum tanımlamaya çalışır", () => yonetim.KurumTanimla(ali, 10, "Özel Klinik"));
 Dene("Kurum yöneticisi kurum tanımlamaya çalışır", () => yonetim.KurumTanimla(yonetici, 10, "Özel Klinik"));
@@ -136,7 +136,7 @@ Dene("Giriş yapan doktor randevu almaya çalışır", () => servis.RandevuOlust
 
 // ---------- 8. UYGUNLUK, ŞUBE SAATLERİNİN İÇİNDE KALMALI ----------
 Baslik("8. ÇALIŞANIN UYGUNLUĞU ŞUBE SAATLERİNİN İÇİNDE KALMALI");
-var yonetim2 = new KurumYonetimServisi();
+var yonetim2 = new KurumYonetimServisi(new KullaniciServisi());
 var kurum8 = yonetim2.KurumTanimla(sistem, 50, "Test Hastanesi");
 var yonetici8 = new KurumYoneticisi(50, "Nur", "Taş", "nur@t.com", "1234", kurum8);
 yonetim2.SubeEkle(yonetici8, new Sube(50, "Ana Şube", "Sakarya"));

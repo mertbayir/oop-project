@@ -11,8 +11,7 @@ public class KullaniciServisi
     // Hasta kendi kendine kayit olabilir. Numarayi sistem verir.
     public Hasta HastaKayitOl(string ad, string soyad, string email, string sifre, string telefon)
     {
-        int id = _kullanicilar.Count == 0 ? 1 : _kullanicilar.Max(k => k.Id) + 1;
-        var hasta = new Hasta(id, ad, soyad, email, sifre, telefon);   // Hasta/Kullanici kendi dogrulamasini yapar
+        var hasta = new Hasta(SonrakiId(), ad, soyad, email, sifre, telefon);   // Hasta/Kullanici kendi dogrulamasini yapar
 
         Kaydet(hasta);
         return hasta;
@@ -23,13 +22,20 @@ public class KullaniciServisi
     {
         ArgumentNullException.ThrowIfNull(kullanici);
 
-        if (_kullanicilar.Any(k => string.Equals(k.Email, kullanici.Email, StringComparison.OrdinalIgnoreCase)))
+        if (EpostaKayitliMi(kullanici.Email))
             throw new InvalidOperationException("Bu e-posta adresiyle kayitli bir kullanici zaten var.");
         if (_kullanicilar.Any(k => k.Id == kullanici.Id))
             throw new InvalidOperationException("Bu numarali bir kullanici zaten var.");
 
         _kullanicilar.Add(kullanici);
     }
+
+    // Yeni bir kullaniciya verilecek numara: mevcut en buyuk numaranin bir fazlasi (hic yoksa 1).
+    public int SonrakiId() => _kullanicilar.Select(k => k.Id).DefaultIfEmpty(0).Max() + 1;
+
+    // E-posta adresi sistemde kayitli mi? (buyuk/kucuk harf farketmez)
+    public bool EpostaKayitliMi(string email)
+        => _kullanicilar.Any(k => string.Equals(k.Email, email, StringComparison.OrdinalIgnoreCase));
 
     public Kullanici GirisYap(string email, string sifre)
     {
