@@ -1,4 +1,3 @@
-using System.Globalization;
 using HastaneRandevu.Core.Models;
 
 namespace HastaneRandevu.App;
@@ -15,9 +14,9 @@ public class CalisanPaneli : PanelFormu
     private readonly Button btnTamamla = new() { Name = "btnTamamla", Text = "Tamamla", Left = 295, Top = 410, Width = 130 };
 
     private readonly ListBox lstUygunluk = new() { Name = "lstUygunluk", Left = 610, Top = 80, Width = 375, Height = 150 };
-    private readonly ComboBox cmbGun = new() { Name = "cmbGun", Left = 690, Top = 275, Width = 200, DropDownStyle = ComboBoxStyle.DropDownList, FormattingEnabled = true };
-    private readonly DateTimePicker dtpBaslangic = SaatKutusu("dtpBaslangic", 307, 9);
-    private readonly DateTimePicker dtpBitis = SaatKutusu("dtpBitis", 339, 12);
+    private readonly ComboBox cmbGun = new() { Name = "cmbGun", Left = 690, Top = 275, Width = 200 };
+    private readonly DateTimePicker dtpBaslangic = SaatKutusu("dtpBaslangic", 690, 307, 9);
+    private readonly DateTimePicker dtpBitis = SaatKutusu("dtpBitis", 690, 339, 12);
     private readonly Button btnEkle = new() { Name = "btnEkle", Text = "Uygunluk ekle", Left = 690, Top = 375, Width = 200 };
 
     public CalisanPaneli(Kullanici kullanici, UygulamaVerisi veri)
@@ -43,18 +42,7 @@ public class CalisanPaneli : PanelFormu
             lstUygunluk, cmbGun, dtpBaslangic, dtpBitis, btnEkle
         });
 
-        // Haftanin gunleri Pazartesi'den baslayarak; ekranda Turkce adlariyla gorunur.
-        cmbGun.Items.AddRange(new object[]
-        {
-            DayOfWeek.Monday, DayOfWeek.Tuesday, DayOfWeek.Wednesday, DayOfWeek.Thursday,
-            DayOfWeek.Friday, DayOfWeek.Saturday, DayOfWeek.Sunday
-        });
-        cmbGun.Format += (_, e) =>
-        {
-            if (e.ListItem is DayOfWeek gun)
-                e.Value = CultureInfo.GetCultureInfo("tr-TR").DateTimeFormat.GetDayName(gun);
-        };
-        cmbGun.SelectedIndex = 0;
+        GunKutusunuHazirla(cmbGun);
 
         btnOnayla.Click += (_, _) => RandevuIslemi((id, c) => Veri.RandevuServisi.Onayla(id, c), "Randevu onaylandı.");
         btnReddet.Click += (_, _) => RandevuIslemi((id, c) => Veri.RandevuServisi.Reddet(id, c), "Randevu reddedildi.");
@@ -123,15 +111,7 @@ public class CalisanPaneli : PanelFormu
     {
         lstUygunluk.Items.Clear();
         lstUygunluk.Items.AddRange(_calisan.Uygunluklar
-            .OrderBy(u => u.Gun == DayOfWeek.Sunday ? 7 : (int)u.Gun)   // Pazar en sona
+            .OrderBy(u => GunSirasi(u.Gun))
             .ThenBy(u => u.Baslangic).Cast<object>().ToArray());
     }
-
-    private static DateTimePicker SaatKutusu(string ad, int ust, int saat)
-        => new()
-        {
-            Name = ad, Left = 690, Top = ust, Width = 100,
-            Format = DateTimePickerFormat.Custom, CustomFormat = "HH:mm", ShowUpDown = true,
-            Value = DateTime.Today.AddHours(saat)
-        };
 }
