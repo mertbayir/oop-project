@@ -15,6 +15,10 @@ public static class PanelSecici
         if (kullanici.YetkiVarMi(Yetki.RandevuOnayla))
             return new CalisanPaneli(kullanici, veri);
 
+        if (kullanici.YetkiVarMi(Yetki.KurumDuzenle))
+            return new YoneticiPaneli(kullanici, veri);
+
+        // Taninmayan / yetkisiz roller icin bos bilgi paneli.
         return new BilgiPaneli(kullanici, veri);
     }
 }
