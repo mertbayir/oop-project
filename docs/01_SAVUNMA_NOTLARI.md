@@ -195,6 +195,41 @@ KullaniciServisi.HastaKayitOl -> Hasta constructor -> `: base(...)` ile Kullanic
 **Demo projesi nedir?**
 HastaneRandevu.Demo: arayüz gelene kadar dört NDP kavramını ve tüm akışı konsola yazdıran küçük bir program (`dotnet run --project HastaneRandevu.Demo`).
 
+## 2f. Paneller, çalışan kaydı ve erişim belirleyiciler
+
+**Arayüzde iş kuralı var mı?**
+Hayır. Her düğme bir servis metodunu çağırır (RandevuServisi, KurumYonetimServisi, KullaniciServisi); çakışma, yetki, doğrulama servislerde ve modellerde. Arayüz (konsol, web, Windows Forms) değişse kurallar aynı kalır.
+
+**Hangi panelin açılacağı nasıl belirleniyor?**
+`PanelSecici` rolün adına değil yetkisine bakar: RandevuAl -> HastaPaneli, RandevuOnayla -> CalisanPaneli, KurumDuzenle -> YoneticiPaneli, KurumTanimla -> SistemPaneli. Yeni bir rol eklenip RandevuAl yetkisi verilirse bu kod değişmeden ona da hasta paneli açılır. Çok biçimlilik arayüzde de çalışıyor.
+
+**PanelFormu neden abstract, üyeleri neden protected?**
+Karşılama yazısı, "Çıkış yap", mesaj etiketi ve yardımcılar (Dene, GunKutusunuHazirla, SaatKutusu, EtiketEkle) tüm panellerde ortak; tabanda bir kez yazıldı (kalıtım). Doğrudan oluşturulmaz (abstract). `protected` üyeleri sadece alt paneller kullanır, başka formlar göremez.
+
+**Aşırı yükleme (overload) nedir, projede nerede?**
+Aynı isim, farklı parametre listesi; hangisinin çalışacağını derleyici parametrelere bakarak derleme sırasında seçer. Örnekler: `KurumTanimla(kullanici, id, ad)` ve `KurumTanimla(kullanici, ad)` (numarayı servis üretir); `Dene(Action, string)` ve `Dene(Func<string>)`. Override ise çalışırken, nesnenin gerçek türüne göre seçilir (`YetkiVarMi`, `RolAdi`, `ToString`).
+
+**Çalışan eklerken neden bu sıra? (CalisanYerlestir)**
+Önce kontroller (e-posta kayıtlı mı, hizmetler bölüme ait mi), kalıcı değişiklikler en sona (şubeye ekleme, giriş hesabı). Bir kontrol patlarsa sistemde yarım kalmış kayıt olmaz. Metodun parametresi `Calisan` tipinde; Doktor ve SaglikPersoneli aynı koddan geçer (kalıtım).
+
+**KurumYonetimServisi neden KullaniciServisi'ni constructor'da alıyor?**
+Çalışan kaydı iki yere yazılır: şubeye ve giriş listesine. İki servisin aynı kullanıcı listesini paylaşması için KullaniciServisi dışarıdan verilir; kimin hangi servisi kullanacağını `UygulamaVerisi` bağlar (bağımlılığı dışarıdan verme).
+
+**Numarayı neden ekran değil servis üretiyor?**
+Numaranın benzersiz olması bir iş kuralıdır. `SonrakiId` mevcut numaraların en büyüğünün bir fazlasını verir. Bölüm numarası kurum genelinde benzersiz tutulur, çünkü hizmet eklenirken bölüm numarayla aranır.
+
+**Erişim belirleyiciler (en dar erişim ilkesi: gerektiği kadar aç)**
+- `public`: herkes. `private`: sadece aynı sınıf. `protected`: sınıf ve alt sınıfları. `internal`: aynı assembly (proje). `protected internal`: protected veya internal. `private protected`: aynı assembly'deki alt sınıflar. `file`: sadece aynı dosya.
+- Projede: `private _sifreHash`, `Hashle`; `Durum { get; private set; }` (herkes okur, sadece Randevu yazar); `protected Kullanici(...)` (sadece alt sınıflar çağırır); `protected` PanelFormu üyeleri; `internal static class Yetkilendirme` (Core'un iç aracı, App göremez).
+- Dürüst not: App'teki sınıfların çoğu `public`; `internal` yeterdi (iyileştirme noktası).
+- `readonly`: bir kez atanır (liste referansı değişmez, içeriği değişebilir). `const`: derleme anında sabit. `sealed`: türetilemez (projede kullanılmadı).
+
+**"Platform-bağımsız" ifadesi?**
+Ödevdeki parantez "dil veya teknoloji serbest" diyor. Core kütüphanesi ve konsol demosu her işletim sisteminde çalışır; Windows Forms arayüzü yalnızca Windows'ta.
+
+**Neden veritabanı yok?**
+Ödev veri saklamayı istemiyor; odak OOP ilkeleriydi. Veriler bellekte, açılışta örnek veriyle yüklenir.
+
 ## 3. Alınan tasarım kararları (özet)
 1. Calisan soyut üst sınıf -> Doktor, SaglikPersoneli
 2. Randevu Calisan'a bağlı
