@@ -2,7 +2,7 @@ using HastaneRandevu.Core.Models;
 
 namespace HastaneRandevu.App;
 
-public class GirisForm : Form
+internal class GirisForm : Form
 {
     private readonly UygulamaVerisi _veri;
 

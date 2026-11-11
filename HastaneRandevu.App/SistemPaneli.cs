@@ -4,7 +4,7 @@ namespace HastaneRandevu.App;
 
 // Sistem yoneticisinin ekrani: kurum tanimlar ve kuruma yonetici atar.
 // Burada is kurali yok; her dugme KurumYonetimServisi'nin bir metodunu cagirir (yetki kontrolu orada).
-public class SistemPaneli : PanelFormu
+internal class SistemPaneli : PanelFormu
 {
     private readonly ListBox lstKurumlar = new() { Name = "lstKurumlar", Left = 15, Top = 75, Width = 400, Height = 230 };
     private readonly TextBox txtKurumAd = new() { Name = "txtKurumAd", Left = 100, Top = 322, Width = 200 };

@@ -4,7 +4,7 @@ namespace HastaneRandevu.App;
 
 // Kurum yoneticisinin ekrani: kendi kurumunun subelerini, calisma saatlerini, bolumlerini ve hizmetlerini tanimlar.
 // Burada da is kurali yok; her dugme KurumYonetimServisi'nin bir metodunu cagirir (yetki kontrolu orada).
-public class YoneticiPaneli : PanelFormu
+internal class YoneticiPaneli : PanelFormu
 {
     private readonly KurumYoneticisi _yonetici;
 

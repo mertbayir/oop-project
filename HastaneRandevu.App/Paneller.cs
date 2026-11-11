@@ -3,7 +3,7 @@ using HastaneRandevu.Core.Models;
 namespace HastaneRandevu.App;
 
 // Yonetici ve sistem yoneticisi icin ekran henuz yok. (HastaPaneli ve CalisanPaneli kendi dosyalarinda.)
-public class BilgiPaneli : PanelFormu
+internal class BilgiPaneli : PanelFormu
 {
     public BilgiPaneli(Kullanici kullanici, UygulamaVerisi veri)
         : base(kullanici, veri, "Bilgi")

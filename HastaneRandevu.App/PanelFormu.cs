@@ -5,7 +5,7 @@ namespace HastaneRandevu.App;
 
 // Giris sonrasi acilan panellerin ortak tabani (KALITIM: her panel bundan turer).
 // Ortak kisimlar: karsilama yazisi, "Cikis yap" dugmesi, mesaj etiketi ve kucuk yardimcilar.
-public abstract class PanelFormu : Form
+internal abstract class PanelFormu : Form
 {
     protected UygulamaVerisi Veri { get; }
     protected Kullanici Kullanici { get; }

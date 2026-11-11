@@ -4,7 +4,7 @@ namespace HastaneRandevu.App;
 
 // Doktor / saglik personelinin ekrani: sol tarafta kendisine gelen randevular, sag tarafta uygunluk saatleri.
 // Burada da is kurali yok; her dugme sadece bir servis metodunu cagirir.
-public class CalisanPaneli : PanelFormu
+internal class CalisanPaneli : PanelFormu
 {
     private readonly Calisan _calisan;
 

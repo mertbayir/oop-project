@@ -4,7 +4,7 @@ namespace HastaneRandevu.App;
 
 // Hastanin ekrani: sol tarafta yeni randevu alma, sag tarafta kendi randevulari.
 // Burada HICBIR is kurali yok; her dugme sadece bir servis metodunu cagirir.
-public class HastaPaneli : PanelFormu
+internal class HastaPaneli : PanelFormu
 {
     private readonly Hasta _hasta;
 

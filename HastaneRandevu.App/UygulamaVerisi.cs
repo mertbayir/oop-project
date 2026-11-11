@@ -5,7 +5,7 @@ namespace HastaneRandevu.App;
 
 // Uygulamanin "ortak masasi": tum ekranlar ayni servisleri buradan kullanir.
 // Veritabani olmadigi icin program acilirken ornek verilerle doldurulur.
-public class UygulamaVerisi
+internal class UygulamaVerisi
 {
     public KullaniciServisi KullaniciServisi { get; }
     public KurumYonetimServisi YonetimServisi { get; }

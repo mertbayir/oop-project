@@ -1,6 +1,6 @@
 namespace HastaneRandevu.App;
 
-public class KayitForm : Form
+internal class KayitForm : Form
 {
     private readonly UygulamaVerisi _veri;
 
