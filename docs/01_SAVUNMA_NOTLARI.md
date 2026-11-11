@@ -221,7 +221,7 @@ Numaranın benzersiz olması bir iş kuralıdır. `SonrakiId` mevcut numaraları
 **Erişim belirleyiciler (en dar erişim ilkesi: gerektiği kadar aç)**
 - `public`: herkes. `private`: sadece aynı sınıf. `protected`: sınıf ve alt sınıfları. `internal`: aynı assembly (proje). `protected internal`: protected veya internal. `private protected`: aynı assembly'deki alt sınıflar. `file`: sadece aynı dosya.
 - Projede: `private _sifreHash`, `Hashle`; `Durum { get; private set; }` (herkes okur, sadece Randevu yazar); `protected Kullanici(...)` (sadece alt sınıflar çağırır); `protected` PanelFormu üyeleri; `internal static class Yetkilendirme` (Core'un iç aracı, App göremez).
-- Dürüst not: App'teki sınıfların çoğu `public`; `internal` yeterdi (iyileştirme noktası).
+- App projesindeki tüm sınıflar `internal`: onları App'in dışından kimse kullanmıyor, en dar erişim ilkesi uygulandı. Core'da ise dışarıya (App, Demo) açılan sınıflar `public`, iç araç olan `Yetkilendirme` `internal`.
 - `readonly`: bir kez atanır (liste referansı değişmez, içeriği değişebilir). `const`: derleme anında sabit. `sealed`: türetilemez (projede kullanılmadı).
 
 **"Platform-bağımsız" ifadesi?**

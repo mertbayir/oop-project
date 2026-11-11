@@ -1,7 +1,7 @@
 namespace HastaneRandevu.App;
 
 // Servislerden gelen hata mesajlarini ekranda gosterilecek hale getirir.
-public static class HataMetni
+internal static class HataMetni
 {
     public static string Al(Exception hata)
     {
